@@ -9,3 +9,8 @@ I can use exportify for now but after awhile I can start developing a spotify we
 I am not sure where I want to take this I mean I think it would be fun to display how diverse my music tastes have gotten over time and have some cool visuals, so maybe I should work on that first 
 
 First use exportify to generate csv files for each of my playlists and then convert them to one giant well formatted csv
+
+I am going to make a conda environment with packages that I will use and then put that into a yaml file in the repo for proper documentation
+
+Through MusicBranz API calls I can get information about the artist (area from, gender) I think I might create a seperate python module just for API calls
+I am also limited to only 50 calls/second so I think I will keep it low just in case traffic gets high as I have 3,000 tracks so ideally I can do 30 calls/second for 10 seconds, and I can use the time.sleep() function in python
