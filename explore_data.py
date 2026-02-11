@@ -40,46 +40,40 @@ def create_track(row: csv.row)-> Track:
     
 
 def get_tracks_from_csv(filename: str)-> list[Track]:
-    tracks = []
 
     with open(filename, "r", encoding="utf-8") as input:
         row_count = sum(1 for _ in input) - 1
 
-    with open(filename, "r", encoding="utf-8") as input:
+    with open(filename, "r", encoding="utf-8") as input, open("summarized_data.csv", "w", newline="") as output:
+        fieldnames = list(Track.model_fields)
         reader = csv.DictReader(input)
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+
         with Progress() as p:
             t = p.add_task("Adding tracks...", total=row_count)
             for row in reader:
-                tracks.append(create_track(row))
+                track = create_track(row)
+                writer.writerow(track.model_dump())
                 p.update(t, advance=1)
-    return tracks
 
 
-def into_playlists(tracks: list[Track])-> dict:
-    playlist_dict = {}
-    for track in tracks:
-        playlist = track["Playlist"]
-        if playlist not in playlist_dict.keys():
-            playlist_dict[playlist] = [track]
-        else:
-            playlist_dict[playlist].append(track)
-    return playlist_dict
-
-
-def write_to_csv(tracks: list[Track], output_name="output.csv"):
-    fieldnames = Track.model_fields.keys()
-    data = [track.model_dump() for track in tracks]
-    with open(output_name, "w", newline="") as output:
-        writer = csv.DictWriter(output, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(data)
+# def into_playlists(tracks: list[Track])-> dict:
+#     playlist_dict = {}
+#     for track in tracks:
+#         playlist = track["Playlist"]
+#         if playlist not in playlist_dict.keys():
+#             playlist_dict[playlist] = [track]
+#         else:
+#             playlist_dict[playlist].append(track)
+#     return playlist_dict
 
 
 # Code
 def main():
     filename = r"playlist_files/all_data.csv"
-    tracks = get_tracks_from_csv(filename)
-    write_to_csv(tracks)
+    get_tracks_from_csv(filename)
+    #write_to_csv(tracks)
     #by_playlist = into_playlists(tracks)
     
 
