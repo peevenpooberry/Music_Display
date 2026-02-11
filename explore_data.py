@@ -4,7 +4,7 @@
 import seaborn as sns
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from Music_Display.modules.MusicBrainz_API_calls import get_artist_area, get_artist_gender
+from modules.MusicBrainz_API_calls import get_artist_area, get_artist_gender
 import csv
 
 # Classes
@@ -19,11 +19,6 @@ class Track(BaseModel):
     Genres: str
     Tempo: float
     Playlist: str
-
-
-
-class Playlist(BaseModel):
-    Tracks: list[Track]
 
 
 # Functions
@@ -50,14 +45,36 @@ def get_tracks_from_csv(filename: str)-> list[Track]:
         for row in all_data:
             track = create_track(row)
             tracks.append(track)
+            break
     return tracks
-            
+
+
+def into_playlists(tracks: list[Track])-> dict:
+    playlist_dict = {}
+    for track in tracks:
+        playlist = track["Playlist"]
+        if playlist not in playlist_dict.keys():
+            playlist_dict[playlist] = [track]
+        else:
+            playlist_dict[playlist].append(track)
+    return playlist_dict
+
+
+# def write_to_csv(tracks: list[Track], output_name="output.csv"):
+#     fieldnames = Track.model_fields.keys()
+#     data = [track.model_dump() for track in tracks]
+#     with open(output_name, "w", newline="") as output:
+#         writer = csv.DictWriterwriter(output, fieldnames=fieldnames)
+#         writer.writeheader()
+#         writer.writerows(data)
 
 
 # Code
 def main():
     filename = r"playlist_files/all_data.csv"
-    get_tracks_from_csv(filename)
+    tracks = get_tracks_from_csv(filename)
+    print(tracks[0])
+    #by_playlist = into_playlists(tracks)
     
 
 if __name__ == "__main__":
