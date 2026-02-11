@@ -188,7 +188,7 @@ country_dict = {
     "Zimbabwe": "zw"
 }
 
-countries = country_dict.values()
+countries_list = country_dict.values()
 
 
 def initialize_country_count()-> dict:

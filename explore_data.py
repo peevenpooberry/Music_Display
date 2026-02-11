@@ -5,6 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from modules.MusicBrainz_API_calls import get_artist_area, get_artist_gender
+from rich.progress import Progress
 import csv
 
 # Classes
@@ -40,12 +41,17 @@ def create_track(row: csv.row)-> Track:
 
 def get_tracks_from_csv(filename: str)-> list[Track]:
     tracks = []
+
     with open(filename, "r", encoding="utf-8") as input:
-        all_data = csv.DictReader(input)
-        for row in all_data:
-            track = create_track(row)
-            tracks.append(track)
-            break
+        row_count = sum(1 for _ in input) - 1
+
+    with open(filename, "r", encoding="utf-8") as input:
+        reader = csv.DictReader(input)
+        with Progress() as p:
+            t = p.add_task("Adding tracks...", total=row_count)
+            for row in reader:
+                tracks.append(create_track(row))
+                p.update(t, advance=1)
     return tracks
 
 
@@ -60,20 +66,20 @@ def into_playlists(tracks: list[Track])-> dict:
     return playlist_dict
 
 
-# def write_to_csv(tracks: list[Track], output_name="output.csv"):
-#     fieldnames = Track.model_fields.keys()
-#     data = [track.model_dump() for track in tracks]
-#     with open(output_name, "w", newline="") as output:
-#         writer = csv.DictWriterwriter(output, fieldnames=fieldnames)
-#         writer.writeheader()
-#         writer.writerows(data)
+def write_to_csv(tracks: list[Track], output_name="output.csv"):
+    fieldnames = Track.model_fields.keys()
+    data = [track.model_dump() for track in tracks]
+    with open(output_name, "w", newline="") as output:
+        writer = csv.DictWriter(output, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(data)
 
 
 # Code
 def main():
     filename = r"playlist_files/all_data.csv"
     tracks = get_tracks_from_csv(filename)
-    print(tracks[0])
+    write_to_csv(tracks)
     #by_playlist = into_playlists(tracks)
     
 
